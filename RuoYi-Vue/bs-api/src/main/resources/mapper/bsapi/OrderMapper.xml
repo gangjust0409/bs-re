@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.bsapi.mapper.OrderMapper">
+    
+    <resultMap type="Order" id="OrderResult">
+        <result property="orderId"    column="order_id"    />
+        <result property="orderSn"    column="order_sn"    />
+        <result property="consignName"    column="consign_name"    />
+        <result property="consignPhone"    column="consign_phone"    />
+        <result property="address"    column="address"    />
+        <result property="shopId"    column="shop_id"    />
+        <result property="shopName"    column="shop_name"    />
+        <result property="totalPrice"    column="total_price"    />
+        <result property="fare"    column="fare"    />
+        <result property="payPrice"    column="pay_price"    />
+        <result property="payStatus"    column="pay_status"    />
+        <result property="logistics"    column="logistics"    />
+        <result property="createDate"    column="create_date"    />
+        <result property="userId" column="user_id"/>
+    </resultMap>
+
+    <sql id="selectOrderVo">
+        select order_id, order_sn, consign_name, consign_phone, address,user_id, shop_id, shop_name, total_price, fare, pay_price, pay_status, logistics, create_date from `order`
+    </sql>
+
+    <select id="selectOrderList" parameterType="Order" resultMap="OrderResult">
+        <include refid="selectOrderVo"/>
+        <where>  
+            <if test="orderSn != null  and orderSn != ''"> and order_sn = #{orderSn}</if>
+            <if test="consignName != null  and consignName != ''"> and consign_name like concat('%', #{consignName}, '%')</if>
+            <if test="consignPhone != null  and consignPhone != ''"> and consign_phone = #{consignPhone}</if>
+            <if test="address != null "> and address = #{address}</if>
+            <if test="shopId != null "> and shop_id = #{shopId}</if>
+            <if test="shopName != null  and shopName != ''"> and shop_name like concat('%', #{shopName}, '%')</if>
+            <if test="totalPrice != null "> and total_price = #{totalPrice}</if>
+            <if test="fare != null "> and fare = #{fare}</if>
+            <if test="payPrice != null "> and pay_price = #{payPrice}</if>
+            <if test="payStatus != null "> and pay_status = #{payStatus}</if>
+            <if test="logistics != null and logistics != 0"> and logistics = #{logistics}</if>
+            <if test="createDate != null "> and create_date = #{createDate}</if>
+            <if test="userId != null and userId != 0"> and user_id = #{userId}</if>
+        </where>
+    </select>
+    
+    <select id="selectOrderByOrderId" parameterType="Long" resultMap="OrderResult">
+        <include refid="selectOrderVo"/>
+        where order_id = #{orderId}
+    </select>
+    <select id="queryOrderCount" resultType="java.lang.Integer">
+        select count(-1) from `order`
+        <where>
+            <if test="orderSn != null">
+                order_sn = #{orderSn}
+            </if>
+            <if test="logistics != null and logistics != 0">
+                and logistics = #{logistics}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertOrder" parameterType="Order" useGeneratedKeys="true" keyProperty="orderId">
+        insert into `order`
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="orderSn != null and orderSn != ''">order_sn,</if>
+            <if test="consignName != null and consignName != ''">consign_name,</if>
+            <if test="consignPhone != null and consignPhone != ''">consign_phone,</if>
+            <if test="address != null">address,</if>
+            <if test="totalPrice != null">total_price,</if>
+            <if test="payPrice != null">pay_price,</if>
+            <if test="payStatus != null">pay_status,</if>
+            <if test="logistics != null">logistics,</if>
+            <if test="createDate != null">create_date,</if>
+            <if test="userId != null">user_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="orderSn != null and orderSn != ''">#{orderSn},</if>
+            <if test="consignName != null and consignName != ''">#{consignName},</if>
+            <if test="consignPhone != null and consignPhone != ''">#{consignPhone},</if>
+            <if test="address != null">#{address},</if>
+            <if test="totalPrice != null">#{totalPrice},</if>
+            <if test="payPrice != null">#{payPrice},</if>
+            <if test="payStatus != null">#{payStatus},</if>
+            <if test="logistics != null">#{logistics},</if>
+            <if test="createDate != null">#{createDate},</if>
+            <if test="userId != null">#{userId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateOrder" parameterType="Order">
+        update `order`
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="orderSn != null and orderSn != ''">order_sn = #{orderSn},</if>
+            <if test="consignName != null and consignName != ''">consign_name = #{consignName},</if>
+            <if test="consignPhone != null and consignPhone != ''">consign_phone = #{consignPhone},</if>
+            <if test="address != null">address = #{address},</if>
+            <if test="shopId != null">shop_id = #{shopId},</if>
+            <if test="shopName != null and shopName != ''">shop_name = #{shopName},</if>
+            <if test="totalPrice != null">total_price = #{totalPrice},</if>
+            <if test="fare != null">fare = #{fare},</if>
+            <if test="payPrice != null">pay_price = #{payPrice},</if>
+            <if test="payStatus != null">pay_status = #{payStatus},</if>
+            <if test="logistics != null">logistics = #{logistics},</if>
+            <if test="createDate != null">create_date = #{createDate},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+        </trim>
+        where order_id = #{orderId}
+    </update>
+    <update id="updateLogistics">
+        update `order` set logistics = #{logistics} where order_sn = ${orderSn}
+    </update>
+
+    <delete id="deleteOrderByOrderId" parameterType="Long">
+        delete from `order` where order_id = #{orderId}
+    </delete>
+
+    <delete id="deleteOrderByOrderIds" parameterType="String">
+        delete from `order` where order_id in
+        <foreach item="orderId" collection="array" open="(" separator="," close=")">
+            #{orderId}
+        </foreach>
+    </delete>
+    <delete id="deleteOrder">
+        delete from `order` where order_sn = #{orderSn}
+    </delete>
+    <delete id="batchDeleteOrder">
+        delete from `order`
+        <where>
+            order_sn in
+            <foreach collection="orderSn" item="osn" open="(" separator="," close=")">
+                #{osn}
+            </foreach>
+        </where>
+    </delete>
+</mapper>

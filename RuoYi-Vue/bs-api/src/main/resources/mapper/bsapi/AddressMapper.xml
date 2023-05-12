@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.bsapi.mapper.AddressMapper">
+    
+    <resultMap type="Address" id="AddressResult">
+        <result property="addressId"    column="address_id"    />
+        <result property="addressName"    column="address_name"    />
+        <result property="userId"    column="user_id"    />
+        <result property="defaultAddress"    column="default_address"    />
+        <result property="descAddress"    column="desc_address"    />
+        <result property="userName" column="user_name"/>
+        <result property="phone" column="phone"/>
+        <result property="fare"    column="fare"    />
+    </resultMap>
+
+    <sql id="selectAddressVo">
+        select address_id, address_name, user_id, default_address, desc_address,phone,user_name, fare from address
+    </sql>
+
+    <select id="selectAddressList" parameterType="Address" resultMap="AddressResult">
+        <include refid="selectAddressVo"/>
+        <where>  
+            <if test="addressName != null  and addressName != ''"> and address_name like concat('%', #{addressName}, '%')</if>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="defaultAddress != null "> and default_address = #{defaultAddress}</if>
+            <if test="descAddress != null  and descAddress != ''"> and desc_address = #{descAddress}</if>
+            <if test="fare != null "> and fare = #{fare}</if>
+        </where>
+    </select>
+    
+    <select id="selectAddressByAddressId" parameterType="Long" resultMap="AddressResult">
+        <include refid="selectAddressVo"/>
+        where address_id = #{addressId}
+    </select>
+        
+    <insert id="insertAddress" parameterType="Address" useGeneratedKeys="true" keyProperty="addressId">
+        insert into address
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="addressName != null and addressName != ''">address_name,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="defaultAddress != null">default_address,</if>
+            <if test="descAddress != null">desc_address,</if>
+            <if test="fare != null">fare,</if>
+            <if test="userName != null">user_name,</if>
+            <if test="phone != null">phone,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="addressName != null and addressName != ''">#{addressName},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="defaultAddress != null">#{defaultAddress},</if>
+            <if test="descAddress != null">#{descAddress},</if>
+            <if test="fare != null">#{fare},</if>
+            <if test="userName != null">#{userName},</if>
+            <if test="phone != null">#{phone},</if>
+         </trim>
+    </insert>
+
+    <update id="updateAddress" parameterType="Address">
+        update address
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="addressName != null and addressName != ''">address_name = #{addressName},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="defaultAddress != null">default_address = #{defaultAddress},</if>
+            <if test="descAddress != null">desc_address = #{descAddress},</if>
+            <if test="fare != null">fare = #{fare},</if>
+        </trim>
+        where address_id = #{addressId}
+    </update>
+    <update id="updateAddressAll">
+        update address set default_address = 2 where user_id = #{userId}
+    </update>
+
+    <delete id="deleteAddressByAddressId" parameterType="Long">
+        delete from address where address_id = #{addressId}
+    </delete>
+
+    <delete id="deleteAddressByAddressIds" parameterType="String">
+        delete from address where address_id in 
+        <foreach item="addressId" collection="array" open="(" separator="," close=")">
+            #{addressId}
+        </foreach>
+    </delete>
+</mapper>

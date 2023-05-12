@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.bsapi.mapper.AttrProductMapper">
+    
+    <resultMap type="AttrProduct" id="AttrProductResult">
+        <result property="attrProductId"    column="attr_product_id"    />
+        <result property="productId"    column="product_id"    />
+        <result property="attrId"    column="attr_id"    />
+    </resultMap>
+
+    <sql id="selectAttrProductVo">
+        select attr_product_id, product_id, attr_id from attr_product
+    </sql>
+
+    <select id="selectAttrProductList" parameterType="AttrProduct" resultMap="AttrProductResult">
+        <include refid="selectAttrProductVo"/>
+        <where>  
+            <if test="productId != null "> and product_id = #{productId}</if>
+            <if test="attrId != null "> and attr_id = #{attrId}</if>
+        </where>
+    </select>
+    
+    <select id="selectAttrProductByAttrProductId" parameterType="Long" resultMap="AttrProductResult">
+        <include refid="selectAttrProductVo"/>
+        where attr_product_id = #{attrProductId}
+    </select>
+        
+    <insert id="insertAttrProduct" parameterType="AttrProduct" useGeneratedKeys="true" keyProperty="attrProductId">
+        insert into attr_product
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="productId != null">product_id,</if>
+            <if test="attrId != null">attr_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="productId != null">#{productId},</if>
+            <if test="attrId != null">#{attrId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateAttrProduct" parameterType="AttrProduct">
+        update attr_product
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="productId != null">product_id = #{productId},</if>
+            <if test="attrId != null">attr_id = #{attrId},</if>
+        </trim>
+        where attr_product_id = #{attrProductId}
+    </update>
+
+    <delete id="deleteAttrProductByAttrProductId" parameterType="Long">
+        delete from attr_product where attr_product_id = #{attrProductId}
+    </delete>
+
+    <delete id="deleteAttrProductByAttrProductIds" parameterType="String">
+        delete from attr_product where attr_product_id in 
+        <foreach item="attrProductId" collection="array" open="(" separator="," close=")">
+            #{attrProductId}
+        </foreach>
+    </delete>
+    <delete id="deleteProductId">
+        delete from attr_product where product_id = #{productId}
+    </delete>
+</mapper>

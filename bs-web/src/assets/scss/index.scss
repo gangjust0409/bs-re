@@ -1,0 +1,60 @@
+// 变量
+$background-color: #f6f6f6 !default;
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 14px;
+}
+
+input:focus {
+    outline: none;
+}
+
+ul {
+    margin: 0;
+    padding: 0;
+
+    li {
+        list-style-type: none;
+    }
+}
+
+body {
+    background-color: $background-color;
+    width: 1290px;
+}
+
+a {
+    font-size: 14px;
+    color: #666;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #c00000;
+}
+
+.product_content {
+    background-color: #fff;
+    border-radius: 10px;
+    margin: 0 80px;
+    padding: 20px;
+}
+
+.price {
+    color: #c00000;
+    font-size: 18px;
+}
+
+.moth {
+    color: #9b9b9b;
+    font-size: 14px;
+}
+
+.msg {
+    color: #9b9b9b;
+    text-align: right;
+}

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.bsapi.mapper.ProductDetailMapper">
+    
+    <resultMap type="ProductDetail" id="ProductDetailResult">
+        <result property="productDetailId"    column="product_detail_id"    />
+        <result property="productDetailUrl"    column="product_detail_url"    />
+        <result property="productId"    column="product_id"    />
+    </resultMap>
+
+    <sql id="selectProductDetailVo">
+        select product_detail_id, product_detail_url, product_id from product_detail
+    </sql>
+
+    <select id="selectProductDetailList" parameterType="ProductDetail" resultMap="ProductDetailResult">
+        <include refid="selectProductDetailVo"/>
+        <where>  
+            <if test="productDetailUrl != null  and productDetailUrl != ''"> and product_detail_url = #{productDetailUrl}</if>
+            <if test="productId != null "> and product_id = #{productId}</if>
+        </where>
+    </select>
+    
+    <select id="selectProductDetailByProductDetailId" parameterType="Long" resultMap="ProductDetailResult">
+        <include refid="selectProductDetailVo"/>
+        where product_detail_id = #{productDetailId}
+    </select>
+        
+    <insert id="insertProductDetail" parameterType="ProductDetail" useGeneratedKeys="true" keyProperty="productDetailId">
+        insert into product_detail
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="productDetailUrl != null">product_detail_url,</if>
+            <if test="productId != null">product_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="productDetailUrl != null">#{productDetailUrl},</if>
+            <if test="productId != null">#{productId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateProductDetail" parameterType="ProductDetail">
+        update product_detail
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="productDetailUrl != null">product_detail_url = #{productDetailUrl},</if>
+            <if test="productId != null">product_id = #{productId},</if>
+        </trim>
+        where product_detail_id = #{productDetailId}
+    </update>
+
+    <delete id="deleteProductDetailByProductDetailId" parameterType="Long">
+        delete from product_detail where product_detail_id = #{productDetailId}
+    </delete>
+
+    <delete id="deleteProductDetailByProductDetailIds">
+        delete from product_detail where product_detail_id in 
+        <foreach item="productDetailId" collection="array" open="(" separator="," close=")">
+            #{productDetailId}
+        </foreach>
+    </delete>
+    <delete id="deleteProductId">
+        delete from product_detail where product_id = #{productId}
+    </delete>
+
+    <update id="deleteProductImgUrl">
+        delete from product_detail where product_detail_url = #{img}
+    </update>
+</mapper>

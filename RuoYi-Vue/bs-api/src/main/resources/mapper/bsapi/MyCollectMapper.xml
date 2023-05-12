@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.bsapi.mapper.MyCollectMapper">
+    
+    <resultMap type="MyCollect" id="MyCollectResult">
+        <result property="myCollectId"    column="my_collect_id"    />
+        <result property="productId"    column="product_id"    />
+        <result property="userId"    column="user_id"    />
+    </resultMap>
+
+    <sql id="selectMyCollectVo">
+        select my_collect_id, product_id, user_id from my_collect
+    </sql>
+
+    <select id="selectMyCollectList" parameterType="MyCollect" resultMap="MyCollectResult">
+        <include refid="selectMyCollectVo"/>
+        <where>  
+            <if test="productId != null "> and product_id = #{productId}</if>
+            <if test="userId != null "> and user_id = #{userId}</if>
+        </where>
+    </select>
+    
+    <select id="selectMyCollectByMyCollectId" parameterType="Long" resultMap="MyCollectResult">
+        <include refid="selectMyCollectVo"/>
+        where my_collect_id = #{myCollectId}
+    </select>
+        
+    <insert id="insertMyCollect" parameterType="MyCollect" useGeneratedKeys="true" keyProperty="myCollectId">
+        insert into my_collect
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="productId != null">product_id,</if>
+            <if test="userId != null">user_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="productId != null">#{productId},</if>
+            <if test="userId != null">#{userId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateMyCollect" parameterType="MyCollect">
+        update my_collect
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="productId != null">product_id = #{productId},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+        </trim>
+        where my_collect_id = #{myCollectId}
+    </update>
+
+    <delete id="deleteMyCollectByMyCollectId" parameterType="Long">
+        delete from my_collect where my_collect_id = #{myCollectId}
+    </delete>
+
+    <delete id="deleteMyCollectByMyCollectIds" parameterType="String">
+        delete from my_collect where my_collect_id in 
+        <foreach item="myCollectId" collection="array" open="(" separator="," close=")">
+            #{myCollectId}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.bsapi.mapper.UserMapper">
+    
+    <resultMap type="User" id="UserResult">
+        <result property="userId"    column="user_id"    />
+        <result property="account"    column="account"    />
+        <result property="nickName"    column="nick_name"    />
+        <result property="password"    column="password"    />
+        <result property="sex"    column="sex"    />
+        <result property="email"    column="email"    />
+        <result property="phone"    column="phone"    />
+        <result property="createDate"    column="create_date"    />
+        <result property="userPic"    column="user_pic"    />
+        <result property="defaultAddressId"    column="default_address_id"    />
+        <result property="totalPrice" column="total_price"/>
+    </resultMap>
+
+    <sql id="selectUserVo">
+        select user_id, account, nick_name, password, sex,total_price, email, phone, create_date, user_pic, default_address_id from user
+    </sql>
+
+    <select id="selectUserList" parameterType="User" resultMap="UserResult">
+        <include refid="selectUserVo"/>
+        <where>  
+            <if test="account != null  and account != ''"> or account = #{account}</if>
+            <if test="nickName != null  and nickName != ''"> or nick_name like concat('%', #{nickName}, '%')</if>
+            <if test="password != null  and password != ''"> and password = #{password}</if>
+            <if test="sex != null and sex != 0"> and sex = #{sex}</if>
+            <if test="email != null  and email != ''"> and email = #{email}</if>
+            <if test="phone != null  and phone != ''"> and phone = #{phone}</if>
+            <if test="createDate != null "> and create_date = #{createDate}</if>
+            <if test="userPic != null  and userPic != ''"> and user_pic = #{userPic}</if>
+            <if test="defaultAddressId != null "> and default_address_id = #{defaultAddressId}</if>
+        </where>
+    </select>
+    
+    <select id="selectUserByUserId" parameterType="Long" resultMap="UserResult">
+        <include refid="selectUserVo"/>
+        where user_id = #{userId}
+    </select>
+        
+    <insert id="insertUser" parameterType="User" useGeneratedKeys="true" keyProperty="userId">
+        insert into user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="account != null and account != ''">account,</if>
+            <if test="nickName != null and nickName != ''">nick_name,</if>
+            <if test="password != null and password != ''">password,</if>
+            <if test="sex != null">sex,</if>
+            <if test="email != null">email,</if>
+            <if test="phone != null">phone,</if>
+            <if test="createDate != null">create_date,</if>
+            <if test="userPic != null">user_pic,</if>
+            <if test="defaultAddressId != null">default_address_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="account != null and account != ''">#{account},</if>
+            <if test="nickName != null and nickName != ''">#{nickName},</if>
+            <if test="password != null and password != ''">#{password},</if>
+            <if test="sex != null">#{sex},</if>
+            <if test="email != null">#{email},</if>
+            <if test="phone != null">#{phone},</if>
+            <if test="createDate != null">#{createDate},</if>
+            <if test="userPic != null">#{userPic},</if>
+            <if test="defaultAddressId != null">#{defaultAddressId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateUser" parameterType="User">
+        update user
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="account != null and account != ''">account = #{account},</if>
+            <if test="nickName != null and nickName != ''">nick_name = #{nickName},</if>
+            <if test="password != null and password != ''">password = #{password},</if>
+            <if test="sex != null and sex != 0">sex = #{sex},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="createDate != null">create_date = #{createDate},</if>
+            <if test="userPic != null">user_pic = #{userPic},</if>
+            <if test="defaultAddressId != null">default_address_id = #{defaultAddressId},</if>
+            <if test="totalPrice != null">total_price = total_price + #{totalPrice},</if>
+        </trim>
+        where user_id = #{userId}
+    </update>
+    <update id="updateUserById" parameterType="User">
+        update user
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="account != null and account != ''">account = #{account},</if>
+            <if test="nickName != null and nickName != ''">nick_name = #{nickName},</if>
+            <if test="password != null and password != ''">password = #{password},</if>
+            <if test="sex != null and sex != 0">sex = #{sex},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="createDate != null">create_date = #{createDate},</if>
+            <if test="userPic != null">user_pic = #{userPic},</if>
+            <if test="defaultAddressId != null">default_address_id = #{defaultAddressId},</if>
+            <if test="totalPrice != null">total_price = #{totalPrice},</if>
+        </trim>
+        where user_id = #{userId}
+    </update>
+
+    <delete id="deleteUserByUserId" parameterType="Long">
+        delete from user where user_id = #{userId}
+    </delete>
+
+    <delete id="deleteUserByUserIds" parameterType="String">
+        delete from user where user_id in 
+        <foreach item="userId" collection="array" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+    </delete>
+
+    <select id="selectUserCount" resultType="java.lang.Long">
+        select count(1) from user
+        <where>
+            <if test="account != null  and account != ''"> and account = #{account}</if>
+            <if test="nickName != null  and nickName != ''"> and nick_name like concat('%', #{nickName}, '%')</if>
+            <if test="password != null  and password != ''"> and password = #{password}</if>
+            <if test="sex != null and sex != 0"> and sex = #{sex}</if>
+            <if test="email != null  and email != ''"> and email = #{email}</if>
+            <if test="phone != null  and phone != ''"> and phone = #{phone}</if>
+            <if test="createDate != null "> and create_date = #{createDate}</if>
+            <if test="userPic != null  and userPic != ''"> and user_pic = #{userPic}</if>
+            <if test="defaultAddressId != null "> and default_address_id = #{defaultAddressId}</if>
+        </where>
+    </select>
+
+</mapper>

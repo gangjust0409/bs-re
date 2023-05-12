@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.bsapi.mapper.ProductMapper">
+    
+    <resultMap type="Product" id="ProductResult">
+        <result property="productId"    column="product_id"    />
+        <result property="productTitle"    column="product_title"    />
+        <result property="productPrice"    column="product_price"    />
+        <result property="productPic"    column="product_pic"    />
+        <result property="shopId"    column="shop_id"    />
+        <result property="monthPin"    column="month_pin"    />
+        <result property="productOldPrice"    column="product_old_price"    />
+        <result property="attrId"    column="attr_id"    />
+        <result property="status"    column="status"    />
+        <result property="catelogId"    column="catelog_id"    />
+    </resultMap>
+
+    <sql id="selectProductVo">
+        select product_id, product_title, product_price, product_pic,catelog_id, status,shop_id, month_pin, product_old_price, attr_id from product
+    </sql>
+
+    <select id="selectProductList" parameterType="Product" resultMap="ProductResult">
+        <include refid="selectProductVo"/>
+        <where>  
+            <if test="productTitle != null  and productTitle != ''"> and product_title like '%${productTitle}%'</if>
+            <if test="productPrice != null "> and product_price = #{productPrice}</if>
+            <if test="productPic != null  and productPic != ''"> and product_pic = #{productPic}</if>
+            <if test="shopId != null "> and shop_id = #{shopId}</if>
+            <if test="monthPin != null "> and month_pin = #{monthPin}</if>
+            <if test="productOldPrice != null "> and product_old_price = #{productOldPrice}</if>
+            <if test="catelogId != null "> and catelog_id = #{catelogId}</if>
+            <if test="status != null and status != 0"> and status = #{status}</if>
+        </where>
+    </select>
+    
+    <select id="selectProductByProductId" parameterType="Long" resultMap="ProductResult">
+        <include refid="selectProductVo"/>
+        where product_id = #{productId}
+    </select>
+    <select id="selectCount" resultType="java.lang.Long">
+        select count(-1) from product
+        <where>
+            <if test="productTitle != null  and productTitle != ''"> and product_title = #{productTitle}</if>
+            <if test="status != null and status != 0"> and status = #{status}</if>
+        </where>
+    </select>
+    <select id="queryProductList" resultMap="ProductResult">
+        <include refid="selectProductVo"/>
+        <where>
+            status = 2
+            <if test="params.productTitle != null  and params.productTitle != ''">
+            and ((product_title like concat('%',#{params.productTitle},'%')</if>
+            <if test="catelogIds != null or catelogIds.length > 0">
+                or catelog_id in
+                <foreach collection="catelogIds" item="ca" open="(" close=")" separator=",">#{ca}
+                </foreach>
+                )
+            </if>
+            /*价格*/
+            <if test="minPrice != 0 and maxPrice == 0 or minPrice != null and maxPrice == null">
+                and product_price >= #{minPrice}
+            </if>
+            <if test="maxPrice != 0 and minPrice == 0 or maxPrice != null and minPrice == null">
+                and product_price &lt;= #{maxPrice}
+            </if>
+            <if test="minPrice != 0 and maxPrice != 0 and minPrice != null and maxPrice != null">
+                and product_price between #{minPrice} and #{maxPrice}
+            </if>
+            )
+        </where>
+    </select>
+
+    <insert id="insertProduct" parameterType="Product" useGeneratedKeys="true" keyProperty="productId">
+        insert into product
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="productTitle != null and productTitle != ''">product_title,</if>
+            <if test="productPrice != null">product_price,</if>
+            <if test="productPic != null">product_pic,</if>
+            <if test="shopId != null">shop_id,</if>
+            <if test="monthPin != null">month_pin,</if>
+            <if test="productOldPrice != null">product_old_price,</if>
+            <if test="attrId != null">attr_id,</if>
+            <if test="catelogId != null">catelog_id,</if>
+            <if test="status != null">status,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="productTitle != null and productTitle != ''">#{productTitle},</if>
+            <if test="productPrice != null">#{productPrice},</if>
+            <if test="productPic != null">#{productPic},</if>
+            <if test="shopId != null">#{shopId},</if>
+            <if test="monthPin != null">#{monthPin},</if>
+            <if test="productOldPrice != null">#{productOldPrice},</if>
+            <if test="attrId != null">#{attrId},</if>
+            <if test="catelogId != null">#{catelogId},</if>
+            <if test="status != null">#{status},</if>
+         </trim>
+    </insert>
+
+    <update id="updateProduct" parameterType="Product">
+        update product
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="productTitle != null and productTitle != ''">product_title = #{productTitle},</if>
+            <if test="productPrice != null">product_price = #{productPrice},</if>
+            <if test="productPic != null">product_pic = #{productPic},</if>
+            <if test="shopId != null">shop_id = #{shopId},</if>
+            <if test="monthPin != null">month_pin = #{monthPin},</if>
+            <if test="productOldPrice != null">product_old_price = #{productOldPrice},</if>
+            <if test="attrId != null">attr_id = #{attrId},</if>
+            <if test="catelogId != null">catelog_id = #{catelogId},</if>
+            <if test="status != null">status = #{status},</if>
+        </trim>
+        where product_id = #{productId}
+    </update>
+
+    <delete id="deleteProductByProductId" parameterType="Long">
+        delete from product where product_id = #{productId}
+    </delete>
+
+    <delete id="deleteProductByProductIds" parameterType="String">
+        delete from product where product_id in 
+        <foreach item="productId" collection="array" open="(" separator="," close=")">
+            #{productId}
+        </foreach>
+    </delete>
+
+    <update id="deleteProductImgUrl">
+        update product set product_pic = null where product_pic = #{img}
+    </update>
+</mapper>

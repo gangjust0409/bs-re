@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.bsapi.mapper.ShopProductMapper">
+    
+    <resultMap type="ShopProduct" id="ShopProductResult">
+        <result property="shopProductId"    column="shop_product_id"    />
+        <result property="shopId"    column="shop_id"    />
+        <result property="productId"    column="product_id"    />
+        <result property="releaseDate"    column="release_date"    />
+    </resultMap>
+
+    <sql id="selectShopProductVo">
+        select shop_product_id, shop_id, product_id, release_date from shop_product
+    </sql>
+
+    <select id="selectShopProductList" parameterType="ShopProduct" resultMap="ShopProductResult">
+        <include refid="selectShopProductVo"/>
+        <where>  
+            <if test="shopId != null "> and shop_id = #{shopId}</if>
+            <if test="productId != null "> and product_id = #{productId}</if>
+            <if test="releaseDate != null "> and release_date = #{releaseDate}</if>
+        </where>
+    </select>
+    
+    <select id="selectShopProductByShopProductId" parameterType="Long" resultMap="ShopProductResult">
+        <include refid="selectShopProductVo"/>
+        where shop_product_id = #{shopProductId}
+    </select>
+        
+    <insert id="insertShopProduct" parameterType="ShopProduct">
+        insert into shop_product
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="shopProductId != null">shop_product_id,</if>
+            <if test="shopId != null">shop_id,</if>
+            <if test="productId != null">product_id,</if>
+            <if test="releaseDate != null">release_date,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="shopProductId != null">#{shopProductId},</if>
+            <if test="shopId != null">#{shopId},</if>
+            <if test="productId != null">#{productId},</if>
+            <if test="releaseDate != null">#{releaseDate},</if>
+         </trim>
+    </insert>
+
+    <update id="updateShopProduct" parameterType="ShopProduct">
+        update shop_product
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="shopId != null">shop_id = #{shopId},</if>
+            <if test="productId != null">product_id = #{productId},</if>
+            <if test="releaseDate != null">release_date = #{releaseDate},</if>
+        </trim>
+        where shop_product_id = #{shopProductId}
+    </update>
+
+    <delete id="deleteShopProductByShopProductId" parameterType="Long">
+        delete from shop_product where shop_product_id = #{shopProductId}
+    </delete>
+
+    <delete id="deleteShopProductByShopProductIds" parameterType="String">
+        delete from shop_product where shop_product_id in 
+        <foreach item="shopProductId" collection="array" open="(" separator="," close=")">
+            #{shopProductId}
+        </foreach>
+    </delete>
+</mapper>

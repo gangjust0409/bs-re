@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.bsapi.mapper.AttrsMapper">
+    
+    <resultMap type="Attrs" id="AttrsResult">
+        <result property="attrId"    column="attr_id"    />
+        <result property="attrName"    column="attr_name"    />
+        <result property="attrValue"    column="attr_value"    />
+        <result property="catelogId"    column="catelog_id"    />
+    </resultMap>
+
+    <sql id="selectAttrsVo">
+        select attr_id, attr_name, attr_value,catelog_id from attrs
+    </sql>
+
+    <select id="selectAttrsList" parameterType="Attrs" resultMap="AttrsResult">
+        <include refid="selectAttrsVo"/>
+        <where>  
+            <if test="attrName != null  and attrName != ''"> and attr_name like concat('%', #{attrName}, '%')</if>
+            <if test="attrValue != null  and attrValue != ''"> and attr_value = #{attrValue}</if>
+            <if test="catelogId != null  and catelogId != ''"> and catelog_id = #{catelogId}</if>
+        </where>
+    </select>
+    
+    <select id="selectAttrsByAttrId" parameterType="Long" resultMap="AttrsResult">
+        <include refid="selectAttrsVo"/>
+        where attr_id = #{attrId}
+    </select>
+    <select id="selectAttrsGroupByAttrName" resultType="com.ruoyi.bsapi.vo.ProductAttrItemVo">
+        select attr_name as title, group_concat(attr_value) as attrValuesWithStr
+        from attrs
+        group by attr_name
+    </select>
+    <select id="selectAttrsGroupByAttrNameByCatelogId" resultType="com.ruoyi.bsapi.vo.ProductAttrItemVo">
+        select attr_name as title, group_concat(attr_id,'-',attr_value) as attrValuesWithStr
+        from attrs
+        where catelog_id = #{catelogId}
+        group by attr_name
+    </select>
+    <select id="selectAttrsByGroupByProductId" resultType="com.ruoyi.bsapi.vo.AttrProductGroupByVo">
+        select attr_name attrName,group_concat(attr_id,'_',attr_value) attrValues
+        from attrs
+        where attr_id in
+            <foreach collection="attrIds" open="(" item="attrId" separator="," close=")">
+                #{attrId}
+            </foreach>
+        group by attr_name
+    </select>
+
+    <insert id="insertAttrs" parameterType="Attrs" useGeneratedKeys="true" keyProperty="attrId">
+        insert into attrs
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="attrName != null and attrName != ''">attr_name,</if>
+            <if test="attrValue != null and attrValue != ''">attr_value,</if>
+            <if test="catelogId != null and catelogId != ''">catelog_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="attrName != null and attrName != ''">#{attrName},</if>
+            <if test="attrValue != null and attrValue != ''">#{attrValue},</if>
+            <if test="catelogId != null and catelogId != ''">#{catelogId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateAttrs" parameterType="Attrs">
+        update attrs
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="attrName != null and attrName != ''">attr_name = #{attrName},</if>
+            <if test="attrValue != null and attrValue != ''">attr_value = #{attrValue},</if>
+            <if test="catelogId != null and catelogId != ''">catelog_id = #{catelogId},</if>
+        </trim>
+        where attr_id = #{attrId}
+    </update>
+
+    <delete id="deleteAttrsByAttrId" parameterType="Long">
+        delete from attrs where attr_id = #{attrId}
+    </delete>
+
+    <delete id="deleteAttrsByAttrIds" parameterType="String">
+        delete from attrs where attr_id in 
+        <foreach item="attrId" collection="array" open="(" separator="," close=")">
+            #{attrId}
+        </foreach>
+    </delete>
+</mapper>

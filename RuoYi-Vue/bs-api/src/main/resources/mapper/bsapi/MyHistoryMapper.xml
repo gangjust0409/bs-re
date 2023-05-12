@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.bsapi.mapper.MyHistoryMapper">
+    
+    <resultMap type="MyHistory" id="MyHistoryResult">
+        <result property="myHistoryId"    column="my_history_id"    />
+        <result property="productId"    column="product_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="historyDate"    column="history_date"    />
+    </resultMap>
+
+    <sql id="selectMyHistoryVo">
+        select my_history_id, product_id, user_id, history_date from my_history
+    </sql>
+
+    <select id="selectMyHistoryList" parameterType="MyHistory" resultMap="MyHistoryResult">
+        <include refid="selectMyHistoryVo"/>
+        <where>  
+            <if test="productId != null "> and product_id = #{productId}</if>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="historyDate != null "> and history_date = #{historyDate}</if>
+        </where>
+    </select>
+    
+    <select id="selectMyHistoryByMyHistoryId" parameterType="Long" resultMap="MyHistoryResult">
+        <include refid="selectMyHistoryVo"/>
+        where my_history_id = #{myHistoryId}
+    </select>
+    <select id="selectMyHistory" resultType="com.ruoyi.bsapi.to.ProductHistoryTo">
+        select history_date as date,group_concat(product_id) as pros
+        from tb_db.my_history
+        where user_id = #{userId}
+        group by history_date
+        order by history_date desc
+    </select>
+
+    <insert id="insertMyHistory" parameterType="MyHistory" useGeneratedKeys="true" keyProperty="myHistoryId">
+        insert into my_history
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="productId != null">product_id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="historyDate != null">history_date,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="productId != null">#{productId},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="historyDate != null">#{historyDate},</if>
+         </trim>
+    </insert>
+
+    <update id="updateMyHistory" parameterType="MyHistory">
+        update my_history
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="productId != null">product_id = #{productId},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="historyDate != null">history_date = #{historyDate},</if>
+        </trim>
+        where my_history_id = #{myHistoryId}
+    </update>
+
+    <delete id="deleteMyHistoryByMyHistoryId" parameterType="Long">
+        delete from my_history where my_history_id = #{myHistoryId}
+    </delete>
+
+    <delete id="deleteMyHistoryByMyHistoryIds" parameterType="String">
+        delete from my_history where my_history_id in 
+        <foreach item="myHistoryId" collection="array" open="(" separator="," close=")">
+            #{myHistoryId}
+        </foreach>
+    </delete>
+</mapper>

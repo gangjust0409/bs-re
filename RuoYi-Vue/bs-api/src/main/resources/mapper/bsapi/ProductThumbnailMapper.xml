@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.bsapi.mapper.ProductThumbnailMapper">
+    
+    <resultMap type="ProductThumbnail" id="ProductThumbnailResult">
+        <result property="productThumbnailId"    column="product_thumbnail_id"    />
+        <result property="productThumbnailUrl"    column="product_thumbnail_url"    />
+        <result property="productId"    column="product_id"    />
+    </resultMap>
+
+    <sql id="selectProductThumbnailVo">
+        select product_thumbnail_id, product_thumbnail_url, product_id from product_thumbnail
+    </sql>
+
+    <select id="selectProductThumbnailList" parameterType="ProductThumbnail" resultMap="ProductThumbnailResult">
+        <include refid="selectProductThumbnailVo"/>
+        <where>  
+            <if test="productThumbnailUrl != null  and productThumbnailUrl != ''"> and product_thumbnail_url = #{productThumbnailUrl}</if>
+            <if test="productId != null "> and product_id = #{productId}</if>
+        </where>
+    </select>
+    
+    <select id="selectProductThumbnailByProductThumbnailId" parameterType="Long" resultMap="ProductThumbnailResult">
+        <include refid="selectProductThumbnailVo"/>
+        where product_thumbnail_id = #{productThumbnailId}
+    </select>
+        
+    <insert id="insertProductThumbnail" parameterType="ProductThumbnail" useGeneratedKeys="true" keyProperty="productThumbnailId">
+        insert into product_thumbnail
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="productThumbnailUrl != null">product_thumbnail_url,</if>
+            <if test="productId != null">product_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="productThumbnailUrl != null">#{productThumbnailUrl},</if>
+            <if test="productId != null">#{productId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateProductThumbnail" parameterType="ProductThumbnail">
+        update product_thumbnail
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="productThumbnailUrl != null">product_thumbnail_url = #{productThumbnailUrl},</if>
+            <if test="productId != null">product_id = #{productId},</if>
+        </trim>
+        where product_thumbnail_id = #{productThumbnailId}
+    </update>
+
+    <delete id="deleteProductThumbnailByProductThumbnailId" parameterType="Long">
+        delete from product_thumbnail where product_thumbnail_id = #{productThumbnailId}
+    </delete>
+
+    <delete id="deleteProductThumbnailByProductThumbnailIds" parameterType="String">
+        delete from product_thumbnail where product_thumbnail_id in 
+        <foreach item="productThumbnailId" collection="array" open="(" separator="," close=")">
+            #{productThumbnailId}
+        </foreach>
+    </delete>
+    <delete id="deleteProductId">
+        delete from product_thumbnail where product_id = #{productId}
+    </delete>
+
+    <update id="deleteProductImgUrl" >
+        delete from product_thumbnail where product_thumbnail_url = #{img}
+    </update>
+
+</mapper>

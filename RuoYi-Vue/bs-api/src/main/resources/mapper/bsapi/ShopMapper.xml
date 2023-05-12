@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.bsapi.mapper.ShopMapper">
+    
+    <resultMap type="Shop" id="ShopResult">
+        <result property="shopId"    column="shop_id"    />
+        <result property="shopName"    column="shop_name"    />
+        <result property="shopPic"    column="shop_pic"    />
+        <result property="createDate"    column="create_date"    />
+    </resultMap>
+
+    <sql id="selectShopVo">
+        select shop_id, shop_name, shop_pic, create_date from shop
+    </sql>
+
+    <select id="selectShopList" parameterType="Shop" resultMap="ShopResult">
+        <include refid="selectShopVo"/>
+        <where>  
+            <if test="shopName != null  and shopName != ''"> and shop_name like '%${shopName}%'</if>
+            <if test="shopPic != null  and shopPic != ''"> and shop_pic = #{shopPic}</if>
+            <if test="createDate != null "> and create_date = #{createDate}</if>
+        </where>
+    </select>
+    
+    <select id="selectShopByShopId" parameterType="Long" resultMap="ShopResult">
+        <include refid="selectShopVo"/>
+        where shop_id = #{shopId}
+    </select>
+    <select id="selectCount" resultType="Integer">
+        select count(-1)
+        from shop
+        <if test="shopName != null and shopName != ''">
+        where shop_name like '%${shopName}%'
+        </if>
+    </select>
+
+    <insert id="insertShop" parameterType="Shop" useGeneratedKeys="true" keyProperty="shopId">
+        insert into shop
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="shopName != null and shopName != ''">shop_name,</if>
+            <if test="shopPic != null">shop_pic,</if>
+            <if test="createDate != null">create_date,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="shopName != null and shopName != ''">#{shopName},</if>
+            <if test="shopPic != null">#{shopPic},</if>
+            <if test="createDate != null">#{createDate},</if>
+         </trim>
+    </insert>
+
+    <update id="updateShop" parameterType="Shop">
+        update shop
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="shopName != null and shopName != ''">shop_name = #{shopName},</if>
+            <if test="shopPic != null">shop_pic = #{shopPic},</if>
+            <if test="createDate != null">create_date = #{createDate},</if>
+        </trim>
+        where shop_id = #{shopId}
+    </update>
+
+    <delete id="deleteShopByShopId" parameterType="Long">
+        delete from shop where shop_id = #{shopId}
+    </delete>
+
+    <delete id="deleteShopByShopIds" parameterType="String">
+        delete from shop where shop_id in 
+        <foreach item="shopId" collection="array" open="(" separator="," close=")">
+            #{shopId}
+        </foreach>
+    </delete>
+</mapper>

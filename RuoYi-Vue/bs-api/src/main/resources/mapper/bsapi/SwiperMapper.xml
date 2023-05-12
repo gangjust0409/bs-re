@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.bsapi.mapper.SwiperMapper">
+    
+    <resultMap type="Swiper" id="SwiperResult">
+        <result property="swiperId"    column="swiper_id"    />
+        <result property="productId"    column="product_id"    />
+        <result property="swiperUrl"    column="swiper_url"    />
+        <result property="enable"    column="enable"    />
+    </resultMap>
+
+    <sql id="selectSwiperVo">
+        select swiper_id, product_id, swiper_url, enable from swiper
+    </sql>
+
+    <select id="selectSwiperList" parameterType="Swiper" resultMap="SwiperResult">
+        <include refid="selectSwiperVo"/>
+        <where>  
+            <if test="productId != null "> and product_id = #{productId}</if>
+            <if test="swiperUrl != null  and swiperUrl != ''"> and swiper_url = #{swiperUrl}</if>
+            <if test="enable != null "> and enable = #{enable}</if>
+        </where>
+    </select>
+    
+    <select id="selectSwiperBySwiperId" parameterType="Long" resultMap="SwiperResult">
+        <include refid="selectSwiperVo"/>
+        where swiper_id = #{swiperId}
+    </select>
+        
+    <insert id="insertSwiper" parameterType="Swiper" useGeneratedKeys="true" keyProperty="swiperId">
+        insert into swiper
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="productId != null">product_id,</if>
+            <if test="swiperUrl != null and swiperUrl != ''">swiper_url,</if>
+            <if test="enable != null">enable,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="productId != null">#{productId},</if>
+            <if test="swiperUrl != null and swiperUrl != ''">#{swiperUrl},</if>
+            <if test="enable != null">#{enable},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSwiper" parameterType="Swiper">
+        update swiper
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="productId != null">product_id = #{productId},</if>
+            <if test="swiperUrl != null and swiperUrl != ''">swiper_url = #{swiperUrl},</if>
+            <if test="enable != null">enable = #{enable},</if>
+        </trim>
+        where swiper_id = #{swiperId}
+    </update>
+
+    <delete id="deleteSwiperBySwiperId" parameterType="Long">
+        delete from swiper where swiper_id = #{swiperId}
+    </delete>
+
+    <delete id="deleteSwiperBySwiperIds" parameterType="String">
+        delete from swiper where swiper_id in 
+        <foreach item="swiperId" collection="array" open="(" separator="," close=")">
+            #{swiperId}
+        </foreach>
+    </delete>
+
+    <select id="selectCount" resultType="java.lang.Integer">
+        select count(-1) from swiper
+    </select>
+
+</mapper>
